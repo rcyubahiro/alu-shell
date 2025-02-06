@@ -1,8 +1,2 @@
-#!/bin/bash  
-for item in * 
-do
-	        if [ -d "$item" ]
-			    then
-				            chmod +x "$item"
-					        fi
-					done
+#!/bin/bash
+for d in *; do [ -d "$d" ] && chmod +x "$d"; done
