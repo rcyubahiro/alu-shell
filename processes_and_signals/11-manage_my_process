@@ -1,37 +1,47 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# This script manages the manage_my_process daemon (start, stop, restart).
 
 PROCESS_NAME="manage_my_process"
 PID_FILE="/var/run/my_process.pid"
 
+start_process() {
+    if [ -f "$PID_FILE" ]; then
+        echo "$PROCESS_NAME is already running."
+        exit 1
+    fi
+
+    ./manage_my_process &
+    echo $! > "$PID_FILE"
+    echo "$PROCESS_NAME started"
+}
+
+stop_process() {
+    if [ ! -f "$PID_FILE" ]; then
+        echo "$PROCESS_NAME is not running."
+        exit 1
+    fi
+
+    kill "$(cat "$PID_FILE")"
+    rm -f "$PID_FILE"
+    echo "$PROCESS_NAME stopped"
+}
+
+restart_process() {
+    stop_process
+    start_process
+    echo "$PROCESS_NAME restarted"
+}
+
 case "$1" in
     start)
-        if [ -f "$PID_FILE" ]; then
-            echo "$PROCESS_NAME is already running!"
-            exit 1
-        fi
-
-        ./manage_my_process &
-        echo $! > "$PID_FILE"
-        echo "$PROCESS_NAME started"
+        start_process
         ;;
-    
     stop)
-        if [ ! -f "$PID_FILE" ]; then
-            echo "$PROCESS_NAME is not running!"
-            exit 1
-        fi
-
-        kill "$(cat $PID_FILE)"
-        rm -f "$PID_FILE"
-        echo "$PROCESS_NAME stopped"
+        stop_process
         ;;
-
     restart)
-        $0 stop
-        $0 start
-        echo "$PROCESS_NAME restarted"
+        restart_process
         ;;
-
     *)
         echo "Usage: $0 {start|stop|restart}"
         exit 1
