@@ -10,8 +10,8 @@ start_process() {
         exit 1
     fi
 
-    ./manage_my_process &
-    echo $! > "$PID_FILE"
+    ./$PROCESS_NAME &  # Start the process in the background
+    echo $! > "$PID_FILE"  # Save its PID
     echo "$PROCESS_NAME started"
 }
 
@@ -21,8 +21,7 @@ stop_process() {
         exit 1
     fi
 
-    kill "$(cat "$PID_FILE")"
-    rm -f "$PID_FILE"
+    kill "$(cat "$PID_FILE")" && rm -f "$PID_FILE"  # Kill process and remove PID file
     echo "$PROCESS_NAME stopped"
 }
 
